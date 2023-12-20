@@ -1,0 +1,17 @@
+# Dépendances
+/node_modules
+
+# Fichiers d'environnement
+.env
+
+# Fichiers spécifiques macOS
+.DS_Store
+
+# Dossiers de logs
+/logs
+
+# Dossiers de build et de distribution
+/build
+/dist
+
+
