@@ -1,11 +1,11 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const userController = {
+const botanistController = {
     async getAll(req, res) {
         try {
-            const users = await prisma.user.findMany();
-            res.json(users);
+            const botanists = await prisma.botanist.findMany();
+            res.json(botanists);
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -13,11 +13,11 @@ const userController = {
     async getOne(req, res) {
         try {
             const { id } = req.params;
-            const user = await prisma.user.findUnique({ where: { id } });
-            if (user) {
-                res.json(user);
+            const botanist = await prisma.botanist.findUnique({ where: { id } });
+            if (botanist) {
+                res.json(botanist);
             } else {
-                res.status(404).json({ error: 'User not found' });
+                res.status(404).json({ error: 'Botanist not found' });
             }
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -25,8 +25,8 @@ const userController = {
     },
     async create(req, res) {
         try {
-            const user = await prisma.user.create({ data: req.body });
-            res.status(201).json(user);
+            const botanist = await prisma.botanist.create({ data: req.body });
+            res.status(201).json(botanist);
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -34,11 +34,11 @@ const userController = {
     async update(req, res) {
         try {
             const { id } = req.params;
-            const user = await prisma.user.update({
+            const botanist = await prisma.botanist.update({
                 where: { id },
                 data: req.body
             });
-            res.json(user);
+            res.json(botanist);
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -46,7 +46,7 @@ const userController = {
     async delete(req, res) {
         try {
             const { id } = req.params;
-            await prisma.user.delete({ where: { id } });
+            await prisma.botanist.delete({ where: { id } });
             res.status(204).send();
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -54,4 +54,4 @@ const userController = {
     },
 };
 
-module.exports = userController;
+module.exports = botanistController;
