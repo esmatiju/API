@@ -28,7 +28,6 @@ model TagsPlant {
 model Plant {
   id               String             @id @default(uuid())
   picture_url      String?
-  tags             String?
   name             String
   description      String?
   hint             String?
