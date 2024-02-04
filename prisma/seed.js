@@ -21,6 +21,7 @@ async function main() {
                 lastname: faker.person.lastName(),
                 firstname: faker.person.firstName(),
                 email: faker.internet.email(),
+                password: faker.internet.password(),
                 picture_url: faker.image.avatar(),
                 isPubliable: faker.datatype.boolean(),
             },

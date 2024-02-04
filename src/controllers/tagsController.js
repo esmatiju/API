@@ -5,51 +5,80 @@ const tagsController = {
     async getAll(req, res) {
         try {
             const tags = await prisma.tags.findMany();
-            res.json(tags);
+            res.status(200).json(tags);
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            console.error(error);
+            res.status(500).json({ error: 'Une erreur s\'est produite lors de la récupération des tags.' });
         }
     },
+
     async getOne(req, res) {
         try {
             const { id } = req.params;
             const tag = await prisma.tags.findUnique({ where: { id } });
             if (tag) {
-                res.json(tag);
+                res.status(200).json(tag);
             } else {
-                res.status(404).json({ error: 'Tag not found' });
+                res.status(404).json({ error: 'Tag non trouvé.' });
             }
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            console.error(error);
+            res.status(500).json({ error: 'Une erreur s\'est produite lors de la récupération du tag.' });
         }
     },
+
     async create(req, res) {
         try {
-            const tag = await prisma.tags.create({ data: req.body });
+            const { name } = req.body;
+            if (!name) {
+                return res.status(400).json({ error: 'Le champ "name" est obligatoire.' });
+            }
+
+            const tag = await prisma.tags.create({ data: { name } });
             res.status(201).json(tag);
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            console.error(error);
+            res.status(500).json({ error: 'Une erreur s\'est produite lors de la création du tag.' });
         }
     },
+
     async update(req, res) {
         try {
             const { id } = req.params;
+            const { name } = req.body;
+
+            if (!name) {
+                return res.status(400).json({ error: 'Le champ "name" est obligatoire.' });
+            }
+
             const tag = await prisma.tags.update({
                 where: { id },
-                data: req.body
+                data: { name }
             });
-            res.json(tag);
+
+            if (tag) {
+                res.status(200).json(tag);
+            } else {
+                res.status(404).json({ error: 'Tag non trouvé.' });
+            }
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            console.error(error);
+            res.status(500).json({ error: 'Une erreur s\'est produite lors de la mise à jour du tag.' });
         }
     },
+
     async delete(req, res) {
         try {
             const { id } = req.params;
-            await prisma.tags.delete({ where: { id } });
-            res.status(204).send();
+            const deletedTag = await prisma.tags.delete({ where: { id } });
+            if (deletedTag) {
+                res.status(204).send();
+            } else {
+                res.status(404).json({ error: 'Tag non trouvé.' });
+            }
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            console.error(error);
+            res.status(500).json({ error: 'Une erreur s\'est produite lors de la suppression du tag.' });
         }
     },
 };

@@ -1,5 +1,6 @@
 # Dépendances
 /node_modules
+/src/uploads/*
 
 # Fichiers d'environnement
 .env

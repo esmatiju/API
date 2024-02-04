@@ -4,7 +4,11 @@ const prisma = new PrismaClient();
 const botanistController = {
     async getAll(req, res) {
         try {
-            const botanists = await prisma.botanist.findMany();
+            const botanists = await prisma.botanist.findMany({
+                include: {
+                    User: true,
+                },
+            });
             res.json(botanists);
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -13,7 +17,12 @@ const botanistController = {
     async getOne(req, res) {
         try {
             const { id } = req.params;
-            const botanist = await prisma.botanist.findUnique({ where: { id } });
+            const botanist = await prisma.botanist.findUnique({
+                where: { id },
+                include: {
+                    User: true, // Inclut l'utilisateur lié au botaniste
+                },
+            });
             if (botanist) {
                 res.json(botanist);
             } else {

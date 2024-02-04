@@ -27,10 +27,10 @@ model TagsPlant {
 
 model Plant {
   id               String             @id @default(uuid())
-  picture_url      String?
+  picture_url      String
   name             String
-  description      String?
-  hint             String?
+  description      String
+  hint             String
   fullname         String
   // Relations
   TagsPlant        TagsPlant[]
@@ -42,15 +42,15 @@ model Garden {
   id               String             @id @default(uuid())
   latitude         Float
   longitude        Float
-  address          String?
+  address          String
   ville            String
-  cp               String?
-  owner_id         String?
+  cp               String
+  owner_id         String
   other_user_id    String?
   updated_at       DateTime           @updatedAt
   created_at       DateTime           @default(now())
-  status           String?
-  botanist_id      String?
+  status           String
+  botanist_id      String
   // Relations
   PlantGardenPhoto PlantGardenPhoto[]
   Message          Message[]
@@ -58,11 +58,12 @@ model Garden {
 
 model User {
   id          String     @id @default(uuid())
-  lastname    String?
-  firstname   String?
-  email       String?    @unique
-  picture_url String?
-  isPubliable Boolean?
+  lastname    String
+  firstname   String
+  email       String     @unique
+  password    String
+  picture_url String
+  isPubliable Boolean
   // Relations
   Botanist    Botanist[]
   Message     Message[]
@@ -89,7 +90,7 @@ model Message {
 
 model Photos {
   id               String             @id @default(uuid())
-  picture_url      String?
+  picture_url      String
   // Relations
   PlantGardenPhoto PlantGardenPhoto[]
   Photo_comu       Photo_comu[]

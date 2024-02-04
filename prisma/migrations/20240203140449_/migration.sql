@@ -16,11 +16,10 @@ CREATE TABLE "TagsPlant" (
 -- CreateTable
 CREATE TABLE "Plant" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "picture_url" TEXT,
-    "tags" TEXT,
+    "picture_url" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "description" TEXT,
-    "hint" TEXT,
+    "description" TEXT NOT NULL,
+    "hint" TEXT NOT NULL,
     "fullname" TEXT NOT NULL
 );
 
@@ -29,25 +28,26 @@ CREATE TABLE "Garden" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "latitude" REAL NOT NULL,
     "longitude" REAL NOT NULL,
-    "address" TEXT,
+    "address" TEXT NOT NULL,
     "ville" TEXT NOT NULL,
-    "cp" TEXT,
-    "owner_id" TEXT,
+    "cp" TEXT NOT NULL,
+    "owner_id" TEXT NOT NULL,
     "other_user_id" TEXT,
     "updated_at" DATETIME NOT NULL,
     "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "status" TEXT,
-    "botanist_id" TEXT
+    "status" TEXT NOT NULL,
+    "botanist_id" TEXT NOT NULL
 );
 
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "lastname" TEXT,
-    "firstname" TEXT,
-    "email" TEXT,
-    "picture_url" TEXT,
-    "isPubliable" BOOLEAN
+    "lastname" TEXT NOT NULL,
+    "firstname" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "picture_url" TEXT NOT NULL,
+    "isPubliable" BOOLEAN NOT NULL
 );
 
 -- CreateTable
@@ -72,7 +72,7 @@ CREATE TABLE "Message" (
 -- CreateTable
 CREATE TABLE "Photos" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "picture_url" TEXT
+    "picture_url" TEXT NOT NULL
 );
 
 -- CreateTable
