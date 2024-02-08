@@ -56,13 +56,11 @@ const tagsController = {
                 data: { name }
             });
 
-            if (tag) {
-                res.status(200).json(tag);
-            } else {
-                res.status(404).json({ error: 'Tag non trouvé.' });
-            }
+            res.status(200).json(tag);
         } catch (error) {
-            console.error(error);
+            if (error.code === 'P2025') {
+                return res.status(404).json({ error: 'Tag non trouvé.' });
+            }
             res.status(500).json({ error: 'Une erreur s\'est produite lors de la mise à jour du tag.' });
         }
     },
@@ -71,16 +69,15 @@ const tagsController = {
         try {
             const { id } = req.params;
             const deletedTag = await prisma.tags.delete({ where: { id } });
-            if (deletedTag) {
-                res.status(204).send();
-            } else {
-                res.status(404).json({ error: 'Tag non trouvé.' });
-            }
+            res.status(204).send();
         } catch (error) {
+            if (error.code === 'P2025') {
+                return res.status(404).json({ error: 'Tag non trouvé.' });
+            }
             console.error(error);
             res.status(500).json({ error: 'Une erreur s\'est produite lors de la suppression du tag.' });
         }
-    },
+    }
 };
 
 module.exports = tagsController;

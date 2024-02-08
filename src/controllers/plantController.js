@@ -46,8 +46,8 @@ const plantController = {
             });
             res.json(plants.map(plant => ({
                 ...plant,
-                tags: plant.TagsPlant.map(tp => tp.Tags),
-                photos: plant.Photo_comu.map(pc => pc.Photos),
+                tags: plant.TagsPlant ? plant.TagsPlant.map(tp => tp.Tags) : [],
+                photos: plant.Photo_comu ? plant.Photo_comu.map(pc => pc.Photos) : [],
             })));
         } catch (error) {
             res.status(500).json({ error: error.message });

@@ -20,7 +20,7 @@ const botanistController = {
             const botanist = await prisma.botanist.findUnique({
                 where: { id },
                 include: {
-                    User: true, // Inclut l'utilisateur lié au botaniste
+                    User: true,
                 },
             });
             if (botanist) {
