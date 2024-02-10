@@ -20,6 +20,13 @@ jest.mock('@prisma/client', () => ({
     },
 }));
 
+jest.mock('fs', () => ({
+    ...jest.requireActual('fs'),
+    writeFileSync: jest.fn().mockImplementation(() => console.log('Mock writeFileSync called')),
+    unlinkSync: jest.fn(),
+    existsSync: jest.fn(() => true),
+}));
+
 describe('User Controller Tests', () => {
     test('GET /api/users should fetch all users', async () => {
         const response = await request(app).get('/api/users');
