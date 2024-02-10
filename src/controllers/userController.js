@@ -9,9 +9,19 @@ const uploadDir = path.join(__dirname, '..', 'uploads');
 function saveBase64Image(base64Image, filename, req) {
     const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, '');
     const dataBuffer = Buffer.from(base64Data, 'base64');
-    const filePath = path.join(uploadDir, filename);
-    fs.writeFileSync(filePath, dataBuffer);
+    fs.writeFileSync(path.join(uploadDir, filename), dataBuffer);
     return `${req.protocol}://${req.get('host')}/uploads/${filename}`;
+}
+
+function deleteImageFile(imageUrl) {
+    if (!imageUrl) return;
+    const filename = imageUrl.split('/uploads/')[1];
+    const filePath = path.join(uploadDir, filename);
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+}
+
+async function hashPassword(password) {
+    return await bcrypt.hash(password, 10);
 }
 
 const userController = {
@@ -28,10 +38,7 @@ const userController = {
         try {
             const { id } = req.params;
             const user = await prisma.user.findUnique({ where: { id } });
-            if (!user) {
-                return res.status(404).json({ error: 'User not found' });
-            }
-            res.json(user);
+            user ? res.json(user) : res.status(404).json({ error: 'User not found' });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -40,12 +47,10 @@ const userController = {
     async create(req, res) {
         try {
             const { lastname, firstname, email, password, picture_url, isPubliable } = req.body;
-            const existingUser = await prisma.user.findUnique({ where: { email } });
-            if (existingUser) {
+            if (await prisma.user.findUnique({ where: { email } })) {
                 return res.status(400).json({ error: 'Email already exists' });
             }
 
-            const hashedPassword = await bcrypt.hash(password, 10);
             let publicProfilePictureUrl = null;
             if (picture_url) {
                 const filename = `profile_picture_${Date.now()}.jpg`;
@@ -57,7 +62,7 @@ const userController = {
                     lastname,
                     firstname,
                     email,
-                    password: hashedPassword,
+                    password: await hashPassword(password),
                     picture_url: publicProfilePictureUrl,
                     isPubliable,
                 },
@@ -73,18 +78,13 @@ const userController = {
         try {
             const { id } = req.params;
             const { lastname, firstname, email, picture_url, isPubliable } = req.body;
-            let updatedData = { lastname, firstname, email, isPubliable };
 
+            const updatedData = { lastname, firstname, email, isPubliable };
             if (picture_url) {
-                const filename = `user_${id}_${Date.now()}.jpg`;
-                updatedData.picture_url = saveBase64Image(picture_url, filename, req);
+                updatedData.picture_url = saveBase64Image(picture_url, `user_${id}_${Date.now()}.jpg`, req);
             }
 
-            const updatedUser = await prisma.user.update({
-                where: { id },
-                data: updatedData,
-            });
-
+            const updatedUser = await prisma.user.update({ where: { id }, data: updatedData });
             res.json(updatedUser);
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -94,6 +94,9 @@ const userController = {
     async delete(req, res) {
         try {
             const { id } = req.params;
+            const user = await prisma.user.findUnique({ where: { id } });
+            if (user && user.picture_url) deleteImageFile(user.picture_url);
+
             await prisma.user.delete({ where: { id } });
             res.status(204).send();
         } catch (error) {
@@ -105,13 +108,7 @@ const userController = {
         try {
             const { email, password } = req.body;
             const user = await prisma.user.findUnique({ where: { email } });
-
-            if (!user) {
-                return res.status(401).json({ error: 'Invalid email or password' });
-            }
-
-            const passwordMatch = await bcrypt.compare(password, user.password);
-            if (!passwordMatch) {
+            if (!user || !(await bcrypt.compare(password, user.password))) {
                 return res.status(401).json({ error: 'Invalid email or password' });
             }
 

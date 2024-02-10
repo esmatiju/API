@@ -12,26 +12,36 @@ function saveBase64Image(base64Image, filename, req) {
     return `${req.protocol}://${req.get('host')}/uploads/${filename}`;
 }
 
+async function deleteFileFromServer(url) {
+    const filename = path.basename(url);
+    const filePath = path.join(uploadDir, filename);
+    if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+    }
+}
+
 async function processTagsAndPhotos(tags, photos, plantId, req) {
     if (tags && tags.length) {
         await prisma.tagsPlant.deleteMany({ where: { id_plant: plantId } });
-        await Promise.all(tags.map(tagId => prisma.tagsPlant.create({
-            data: { id_plant: plantId, id_tags: tagId },
-        })));
+        const tagLinks = tags.map(tagId => ({ id_plant: plantId, id_tags: tagId }));
+        await prisma.tagsPlant.createMany({ data: tagLinks });
     }
 
     if (photos && photos.length) {
         const existingPhotos = await prisma.photo_comu.findMany({ where: { plant_id: plantId } });
-        await Promise.all(existingPhotos.map(p => prisma.photos.delete({ where: { id: p.id_photos } })));
+        const photoDeletions = existingPhotos.map(p => prisma.photos.delete({ where: { id: p.id_photos } }));
+        await Promise.all(photoDeletions);
+
         await prisma.photo_comu.deleteMany({ where: { plant_id: plantId } });
 
-        await Promise.all(photos.map((photo, index) => {
+        const photoCreations = photos.map((photo, index) => {
             const filename = `photo_${plantId}_${Date.now()}_${index}.jpg`;
-            const photoUrl = saveBase64Image(photo, filename);
+            const photoUrl = saveBase64Image(photo, filename, req);
             return prisma.photos.create({
                 data: { picture_url: photoUrl, Photo_comu: { create: { plant_id: plantId } } },
             });
-        }));
+        });
+        await Promise.all(photoCreations);
     }
 }
 
@@ -44,72 +54,106 @@ const plantController = {
                     Photo_comu: { include: { Photos: true } },
                 },
             });
+
             res.json(plants.map(plant => ({
                 ...plant,
-                tags: plant.TagsPlant ? plant.TagsPlant.map(tp => tp.Tags) : [],
-                photos: plant.Photo_comu ? plant.Photo_comu.map(pc => pc.Photos) : [],
+                hint: plant.hint ? JSON.parse(plant.hint) : null,
+                tags: plant.TagsPlant.map(tp => tp.Tags),
+                photos: plant.Photo_comu.map(pc => pc.Photos),
             })));
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).send({ error: 'Server error occurred while fetching plants.' });
         }
     },
 
     async getOne(req, res) {
         try {
+            const { id } = req.params;
             const plant = await prisma.plant.findUnique({
-                where: { id: req.params.id },
-                include: { TagsPlant: { include: { Tags: true } }, Photo_comu: { include: { Photos: true } } },
+                where: { id },
+                include: {
+                    TagsPlant: { include: { Tags: true } },
+                    Photo_comu: { include: { Photos: true } },
+                },
             });
-            if (!plant) return res.status(404).json({ error: 'Plant not found' });
+
+            if (!plant) {
+                return res.status(404).send({ error: 'Plant not found.' });
+            }
+
             res.json({
                 ...plant,
+                hint: plant.hint ? JSON.parse(plant.hint) : null,
                 tags: plant.TagsPlant.map(tp => tp.Tags),
                 photos: plant.Photo_comu.map(pc => pc.Photos),
             });
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).send({ error: error });
         }
     },
 
     async create(req, res) {
         const { name, description, hint, fullname, picture_url, tags, photos } = req.body;
+
         try {
             const plantPictureUrl = picture_url ? saveBase64Image(picture_url, `plant_${Date.now()}.jpg`, req) : null;
-            const createdPlant = await prisma.plant.create({
-                data: { name, description, hint, fullname, picture_url: plantPictureUrl },
-            });
+            const plantData = { name, description, hint: hint ? JSON.stringify(hint) : null, fullname, picture_url: plantPictureUrl };
+            const createdPlant = await prisma.plant.create({ data: plantData });
 
             await processTagsAndPhotos(tags, photos, createdPlant.id, req);
+
             res.status(201).json(createdPlant);
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).send({ error: error });
         }
     },
 
     async update(req, res) {
-        const { id } = req.params;
         const { name, description, hint, fullname, picture_url, tags, photos } = req.body;
-        try {
-            const updatedPlantPictureUrl = picture_url ? saveBase64Image(picture_url, `plant_${id}_${Date.now()}.jpg`, req) : undefined;
-            const data = { name, description, hint, fullname, ...(updatedPlantPictureUrl && { picture_url: updatedPlantPictureUrl }) };
+        const plantId = parseInt(req.params.id);
 
-            const updatedPlant = await prisma.plant.update({ where: { id }, data });
-            await processTagsAndPhotos(tags, photos, id, req);
+        try {
+            const updatedPlantPictureUrl = picture_url ? saveBase64Image(picture_url, `plant_${plantId}_${Date.now()}.jpg`, req) : null;
+            const updateData = { name, description, hint: hint ? JSON.stringify(hint) : null, fullname, ...(updatedPlantPictureUrl && { picture_url: updatedPlantPictureUrl }) };
+            const updatedPlant = await prisma.plant.update({ where: { id: plantId }, data: updateData });
+
+            await processTagsAndPhotos(tags, photos, plantId, req);
+
             res.json(updatedPlant);
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).send({ error: 'Server error occurred while updating the plant.' });
         }
     },
 
     async delete(req, res) {
-        const { id } = req.params;
+        const plantId = req.params.id;
+
         try {
-            await prisma.photo_comu.deleteMany({ where: { plant_id: id } });
-            await prisma.tagsPlant.deleteMany({ where: { id_plant: id } });
-            await prisma.plant.delete({ where: { id } });
+            const plant = await prisma.plant.findUnique({
+                where: { id: plantId},
+                include: {
+                    Photo_comu: { include: { Photos: true } },
+                },
+            });
+            const photos = plant.Photo_comu.map(pc => pc.Photos);
+            photos.forEach(p => {
+                const picture_url = p.picture_url;
+                if (picture_url) {
+                    deleteFileFromServer(picture_url);
+                }
+                prisma.photos.delete({ where: { id: p.id } });
+            });
+            const picture_url = plant.picture_url;
+            if (picture_url) {
+                await deleteFileFromServer(picture_url);
+            }
+            await prisma.photo_comu.deleteMany({ where: { plant_id: plantId } });
+            await prisma.tagsPlant.deleteMany({ where: { id_plant: plantId } });
+            await prisma.plant.delete({ where: { id: plantId } });
+
             res.status(204).send();
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).send({ error: error });
         }
     },
 };

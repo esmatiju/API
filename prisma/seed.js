@@ -62,13 +62,20 @@ async function main() {
     // Plants
     const plants = [];
     for (let i = 0; i < 30; i++) {
+        const plantHint = {
+            light: faker.helpers.arrayElement(['Full sun', 'Partial shade', 'Full shade']),
+            water: faker.helpers.arrayElement(['Daily', 'Weekly', 'Bi-weekly', 'Monthly']),
+            temperature: faker.helpers.arrayElement(['Cold', 'Cool', 'Warm', 'Hot']),
+            soil: faker.helpers.arrayElement(['Loamy', 'Sandy', 'Clay', 'Peaty']),
+        };
+
         const plant = await prisma.plant.create({
             data: {
-                picture_url: faker.image.imageUrl(),
+                picture_url: faker.image.url(),
                 name: faker.commerce.productName(),
                 description: faker.lorem.sentences(2),
-                hint: faker.lorem.sentence(),
-                fullname: faker.person.fullName(),
+                hint: JSON.stringify(plantHint), // Convertir l'objet JavaScript en chaîne JSON
+                fullname: faker.commerce.productName(),
             },
         });
         plants.push(plant);
@@ -77,7 +84,7 @@ async function main() {
     // TagsPlant
     for (const plant of plants) {
         const shuffledTags = faker.helpers.shuffle(tags);
-        const tagsForPlant = shuffledTags.slice(0, faker.datatype.number({ min: 1, max: 3 }));
+        const tagsForPlant = shuffledTags.slice(0, faker.number.int({ min: 1, max: 3 }));
         for (const tag of tagsForPlant) {
             await prisma.tagsPlant.create({
                 data: {

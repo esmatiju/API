@@ -11,7 +11,7 @@ jest.mock('@prisma/client', () => ({
                         id: '123',
                         name: 'Test Plant',
                         description: 'A test plant for the plant controller',
-                        hint: 'Needs sunlight',
+                        hint: '{"astucec 1": "astuce 1", "astuce 2": "astuce 2"}',
                         fullname: 'Test Plantus',
                         picture_url: 'https://example.com/plant-image.jpg',
                         TagsPlant: [{
@@ -28,7 +28,7 @@ jest.mock('@prisma/client', () => ({
                             id: '123',
                             name: 'Test Plant',
                             description: 'A test plant for the plant controller',
-                            hint: 'Needs sunlight',
+                            hint: '{"astucec 1": "astuce 1", "astuce 2": "astuce 2"}',
                             fullname: 'Test Plantus',
                             picture_url: 'https://example.com/plant-image.jpg',
                             TagsPlant: [{
