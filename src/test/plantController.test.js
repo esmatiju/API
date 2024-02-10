@@ -52,6 +52,10 @@ jest.mock('@prisma/client', () => ({
             this.photo_comu = {
                 deleteMany: jest.fn().mockResolvedValue({}),
             };
+            this.photos = {
+                delete: jest.fn().mockResolvedValue({}),
+                deleteMany: jest.fn().mockResolvedValue({}),
+            };
         }
     },
 }));
