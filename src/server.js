@@ -22,7 +22,6 @@ async function resetAndSeedDatabase() {
 
 async function startServer() {
   try {
-    await resetAndSeedDatabase();
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
