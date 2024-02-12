@@ -3,6 +3,14 @@ const faker = require('@faker-js/faker').faker;
 
 const prisma = new PrismaClient();
 
+const imageUrls = [
+    'https://t4.ftcdn.net/jpg/02/68/17/95/240_F_268179518_JxhMIr78eZna4MNeI7XJGme4w8kneZon.jpg',
+    'https://t3.ftcdn.net/jpg/02/09/09/64/240_F_209096426_tAiTia4Ouijepx4vXBZZThHdijkuaJ6K.jpg',
+    'https://t3.ftcdn.net/jpg/00/10/09/04/240_F_10090400_GeUsfxOAt88U1d9cA3ZzUaW6XVT5oXou.jpg',
+    'https://t4.ftcdn.net/jpg/02/95/55/45/240_F_295554551_lMRJcX15jGGoo31pr0YkA8VyNnP8SOe3.jpg',
+    'https://t4.ftcdn.net/jpg/03/19/43/39/240_F_319433958_P0JtWdDnR5TWER001KkFXBlofHJ7lCT0.jpg'
+]
+
 async function main() {
     // Tags
     const tags = [];
@@ -71,10 +79,10 @@ async function main() {
 
         const plant = await prisma.plant.create({
             data: {
-                picture_url: faker.image.url(),
+                picture_url: faker.helpers.arrayElement(imageUrls),
                 name: faker.commerce.productName(),
                 description: faker.lorem.sentences(2),
-                hint: JSON.stringify(plantHint), // Convertir l'objet JavaScript en chaîne JSON
+                hint: JSON.stringify(plantHint),
                 fullname: faker.commerce.productName(),
             },
         });
@@ -100,7 +108,7 @@ async function main() {
     for (let i = 0; i < 50; i++) {
         const photo = await prisma.photos.create({
             data: {
-                picture_url: faker.image.url(),
+                picture_url: faker.helpers.arrayElement(imageUrls),
             },
         });
         photos.push(photo);
