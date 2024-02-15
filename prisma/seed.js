@@ -60,7 +60,7 @@ async function main() {
                 ville: faker.location.city(),
                 cp: faker.location.zipCode(),
                 owner_id: faker.helpers.arrayElement(users).id,
-                status: faker.helpers.arrayElement(['Active', 'Inactive']),
+                status: faker.helpers.arrayElement(['search', 'guard']),
                 botanist_id: faker.helpers.arrayElement(botanists).id,
             },
         });

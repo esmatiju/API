@@ -81,6 +81,10 @@ const gardenController = {
     async create(req, res) {
         const { latitude, longitude, address, ville, cp, owner_id, status, botanist_id, photos } = req.body;
 
+        if (status !== 'search' && status !== 'guard') {
+            return res.status(400).json({ error: 'Invalid status. Status must be either "search" or "guard".' });
+        }
+
         try {
             const garden = await prisma.garden.create({
                 data: { latitude, longitude, address, ville, cp, owner_id, status, botanist_id }
@@ -98,6 +102,10 @@ const gardenController = {
     async update(req, res) {
         const { id } = req.params;
         const { latitude, longitude, address, ville, cp, owner_id, status, botanist_id, photos } = req.body;
+
+        if (status !== 'search' && status !== 'guard') {
+            return res.status(400).json({ error: 'Invalid status. Status must be either "search" or "guard".' });
+        }
 
         try {
             const garden = await prisma.garden.update({

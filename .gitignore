@@ -1,6 +1,7 @@
 # Dépendances
 /node_modules
 /src/uploads/*
+!/src/uploads/.gitkeep
 
 # Fichiers d'environnement
 .env
