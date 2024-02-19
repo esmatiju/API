@@ -3,9 +3,6 @@
 /src/uploads/*
 !/src/uploads/.gitkeep
 
-# Fichiers d'environnement
-.env
-
 # Fichiers spécifiques macOS
 .DS_Store
 
