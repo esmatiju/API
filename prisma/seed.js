@@ -90,6 +90,15 @@ async function main() {
         });
         plants.push(plant);
     }
+    await prisma.plant.create({
+        data: {
+            picture_url: faker.helpers.arrayElement(imageUrls),
+            name: "Unknown",
+            description: "Unknown",
+            hint: {},
+            fullname: "Unknown",
+        },
+    });
 
     // TagsPlant
     for (const plant of plants) {
