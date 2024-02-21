@@ -17,7 +17,7 @@ jest.mock('@prisma/client', () => ({
                 findMany: jest.fn().mockResolvedValue([]),
                 findUnique: jest.fn().mockImplementation((opts) => {
                     if (opts.where.id === 'garden123') {
-                        return Promise.resolve({ id: 'garden123', latitude: 1.234, longitude: 2.345, address: '123 Test St', ville: 'Testville', cp: '12345', owner_id: 'user123', status: 'Active', botanist_id: 'botanist123' });
+                        return Promise.resolve({ id: 'garden123', latitude: 1.234, longitude: 2.345, address: '123 Test St', ville: 'Testville', cp: '12345', owner_id: 'user123', status: 'search', botanist_id: 'botanist123' });
                     }
                     return Promise.resolve(null);
                 }),
@@ -67,7 +67,7 @@ describe('Garden Controller', () => {
                 ville: 'Newville',
                 cp: '54321',
                 owner_id: 'user123', // Use the mocked user ID
-                status: 'New',
+                status: 'search',
                 botanist_id: 'botanist123', // Use the mocked botanist ID
                 photos: [],
             };
@@ -81,7 +81,7 @@ describe('Garden Controller', () => {
     describe('PUT /api/gardens/:id', () => {
         test('should update garden details', async () => {
             const gardenId = 'garden123'; // Use the mocked garden ID
-            const updatedData = { ville: 'Updatedville', photos: [] };
+            const updatedData = {latitude: 1.234, longitude: 2.345, address: '123 Test St', ville: 'Updatedville', cp: '12345', owner_id: 'user123', status: 'search', botanist_id: 'botanist123', photos: [] };
             const response = await request(app).put(`/api/gardens/${gardenId}`).send(updatedData);
             expect(response.statusCode).toBe(200);
             expect(response.body.ville).toEqual('Updatedville');
