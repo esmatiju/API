@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
-const {hash} = require("bcrypt");
+const bcrypt = require('bcrypt');
 const faker = require('@faker-js/faker').faker;
 
 const prisma = new PrismaClient();
@@ -10,7 +10,12 @@ const imageUrls = [
     'https://t3.ftcdn.net/jpg/00/10/09/04/240_F_10090400_GeUsfxOAt88U1d9cA3ZzUaW6XVT5oXou.jpg',
     'https://t4.ftcdn.net/jpg/02/95/55/45/240_F_295554551_lMRJcX15jGGoo31pr0YkA8VyNnP8SOe3.jpg',
     'https://t4.ftcdn.net/jpg/03/19/43/39/240_F_319433958_P0JtWdDnR5TWER001KkFXBlofHJ7lCT0.jpg'
-]
+];
+
+const plantNames = ["Acer palmatum", "Rosa 'New Dawn'", "Lavandula angustifolia", "Ficus lyrata"];
+const soilTypes = ["Loamy", "Sandy", "Clay", "Peaty"];
+const lightConditions = ["Full sun", "Partial shade", "Full shade"];
+const waterFrequency = ["Daily", "Weekly", "Bi-weekly", "Monthly"];
 
 async function main() {
     // Tags
@@ -25,7 +30,7 @@ async function main() {
     // Users
     const users = [];
     for (let i = 0; i < 20; i++) {
-        let password = await hash('password', 10);
+        let password = await bcrypt.hash('password', 10);
         const user = await prisma.user.create({
             data: {
                 lastname: faker.person.lastName(),
@@ -39,13 +44,13 @@ async function main() {
         users.push(user);
     }
 
-    //Botanists
+    // Botanists
     const botanists = [];
     for (let i = 0; i < 5; i++) {
         const botanist = await prisma.botanist.create({
             data: {
                 user_id: faker.helpers.arrayElement(users).id,
-                siret: faker.number.int({ min: 10000000000000, max: 99999999999999 }).toString(),
+                siret: faker.finance.accountNumber(14),
             },
         });
         botanists.push(botanist);
@@ -73,32 +78,34 @@ async function main() {
     const plants = [];
     for (let i = 0; i < 30; i++) {
         const plantHint = {
-            light: faker.helpers.arrayElement(['Full sun', 'Partial shade', 'Full shade']),
-            water: faker.helpers.arrayElement(['Daily', 'Weekly', 'Bi-weekly', 'Monthly']),
+            light: faker.helpers.arrayElement(lightConditions),
+            water: faker.helpers.arrayElement(waterFrequency),
             temperature: faker.helpers.arrayElement(['Cold', 'Cool', 'Warm', 'Hot']),
-            soil: faker.helpers.arrayElement(['Loamy', 'Sandy', 'Clay', 'Peaty']),
+            soil: faker.helpers.arrayElement(soilTypes),
         };
 
         const plant = await prisma.plant.create({
             data: {
                 picture_url: faker.helpers.arrayElement(imageUrls),
-                name: faker.commerce.productName(),
+                name: faker.helpers.arrayElement(plantNames),
                 description: faker.lorem.sentences(2),
                 hint: JSON.stringify(plantHint),
-                fullname: faker.commerce.productName(),
+                fullname: faker.helpers.arrayElement(plantNames),
             },
         });
         plants.push(plant);
     }
-    await prisma.plant.create({
+
+    const unknownPlant = await prisma.plant.create({
         data: {
-            picture_url: faker.helpers.arrayElement(imageUrls),
+            picture_url: 'https://t4.ftcdn.net/jpg/03/19/43/39/240_F_319433958_P0JtWdDnR5TWER001KkFXBlofHJ7lCT0.jpg', // Utilisez une URL d'image générique ou un placeholder
             name: "Unknown",
-            description: "Unknown",
-            hint: {},
-            fullname: "Unknown",
+            description: "Details are not available",
+            hint: JSON.stringify({}),
+            fullname: "Unknown Species",
         },
     });
+    plants.push(unknownPlant);
 
     // TagsPlant
     for (const plant of plants) {
@@ -150,7 +157,7 @@ async function main() {
         });
     }
 
-    // Photo_comu
+    // PhotoComu
     for (const photo of photos) {
         const plant = faker.helpers.arrayElement(plants);
         await prisma.photo_comu.create({
