@@ -75,7 +75,8 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
 
               # Now we have got the access of EC2 and we will start the deploy .
-              sudo su
-              docker run -it -p 6969:6969 -d --name api hamtiac/arosaje_api_v2:dev
-              docker ps
+              # sudo su
+              # sudo usermod -a -G docker $USER
+              sudo docker run -it -p 6969:6969 -d --name api hamtiac/arosaje_api_v2:dev
+              sudo docker ps
               '
