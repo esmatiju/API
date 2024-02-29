@@ -73,7 +73,10 @@ describe('Plant Controller', () => {
     describe('GET /api/plants', () => {
         test('should fetch all plants', async () => {
             const response = await request(app).get('/api/plants');
-            expect(response.statusCode).toBe(200);
+            // wrong code ->
+            expect(response.statusCode).toBe(400);
+            // good code ->
+            // expect(response.statusCode).toBe(200);
             expect(Array.isArray(response.body)).toBeTruthy();
         });
     });
