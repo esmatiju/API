@@ -31,6 +31,7 @@ jobs:
 
   push_container_to_registry:
     name: Push Docker image to Docker Hub
+    needs: Check_branch
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -58,6 +59,7 @@ jobs:
 
   Deploy_server:
     name: Deploy to EC2
+    needs: push_container_to_registry
     runs-on: ubuntu-latest
 
     steps:
