@@ -1,9 +1,9 @@
-name: ci-cd-api-preprod
-run-name: Launch api from preprod branch
+name: ci-cd-api-prod
+run-name: Launch api from prod branch
 on:
   push:
     branches:
-      - preprod
+      - prod
 jobs:
   Check_branch:
     runs-on: ubuntu-latest
@@ -19,15 +19,12 @@ jobs:
           node prisma/seed.js || true
 
       - name: lint project
-        # ça risque de ne pas marcher car quand on run la commande de base on nous demande une action de configuration...
         run: npm run lint
 
       # - name: reporting-code-coverage
       - name: run tests
-        # unitaire
+        # test unitaire
         run: npm test
-        # integration
-        # fonctionnel ?
 
   push_container_to_registry:
     name: Push Docker image to Docker Hub
@@ -55,8 +52,8 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          build-args: GIT_BRANCH=preprod
-          tags: ${{ secrets.DOCKER_USERNAME }}/arosaje_api_v2:preprod
+          build-args: GIT_BRANCH=prod
+          tags: ${{ secrets.DOCKER_USERNAME }}/arosaje_api_v2:prod
 
   Deploy_server:
     name: Deploy to EC2
@@ -75,9 +72,6 @@ jobs:
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
 
-              # Now we have got the access of EC2 and we will start the deploy .
-              # sudo su
-              # sudo usermod -a -G docker $USER
-              sudo docker run -it -p 6969:6969 -d --name api hamtiac/arosaje_api_v2:preprod
+              sudo docker run -it -p 6969:6969 -d --name api hamtiac/arosaje_api_v2:prod
               sudo docker ps
               '
