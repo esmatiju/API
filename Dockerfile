@@ -1,5 +1,6 @@
 # base image
 FROM node:lts
+ARG GIT_BRANCH
 
 # clone repository
 RUN apt-get -qy update && apt-get install -yq --no-install-recommends \
@@ -7,7 +8,7 @@ RUN apt-get -qy update && apt-get install -yq --no-install-recommends \
         git \
         curl
 
-RUN git clone --branch dev https://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@github.com/esmatiju/API.git
+RUN git clone --branch $GIT_BRANCH https://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@github.com/esmatiju/API.git
 
 # create & set working directory
 COPY . /API
