@@ -13,7 +13,8 @@
     "prisma": "^5.7.1",
     "supertest": "^6.3.4"
   },
-    "scripts": {
-        "test": "jest"
-    }
+  "scripts": {
+    "test": "jest",
+    "lint": "next lint -- --dir src"
+  }
 }
