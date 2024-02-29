@@ -1,9 +1,9 @@
-name: ci-cd-api-dev
-run-name: Launch api from dev branch
+name: ci-cd-api-preprod
+run-name: Launch api from preprod branch
 on:
   push:
     branches:
-      - dev
+      - preprod
 jobs:
   Check_branch:
     runs-on: ubuntu-latest
@@ -55,7 +55,8 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/arosaje_api_v2:dev
+          build-args: GIT_BRANCH=preprod
+          tags: ${{ secrets.DOCKER_USERNAME }}/arosaje_api_v2:preprod
 
   Deploy_server:
     name: Deploy to EC2
@@ -77,6 +78,6 @@ jobs:
               # Now we have got the access of EC2 and we will start the deploy .
               # sudo su
               # sudo usermod -a -G docker $USER
-              sudo docker run -it -p 6969:6969 -d --name api hamtiac/arosaje_api_v2:dev
+              sudo docker run -it -p 6969:6969 -d --name api hamtiac/arosaje_api_v2:preprod
               sudo docker ps
               '
