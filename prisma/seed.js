@@ -18,6 +18,18 @@ const lightConditions = ["Full sun", "Partial shade", "Full shade"];
 const waterFrequency = ["Daily", "Weekly", "Bi-weekly", "Monthly"];
 
 async function main() {
+
+    await prisma.photo_comu.deleteMany();
+    await prisma.message.deleteMany();
+    await prisma.plantGardenPhoto.deleteMany();
+    await prisma.photos.deleteMany();
+    await prisma.tagsPlant.deleteMany();
+    await prisma.plant.deleteMany();
+    await prisma.garden.deleteMany();
+    await prisma.botanist.deleteMany();
+    await prisma.user.deleteMany();
+    await prisma.tags.deleteMany();
+
     // Tags
     const tags = [];
     for (let i = 0; i < 10; i++) {
@@ -152,7 +164,7 @@ async function main() {
             data: {
                 user_id: user.id,
                 garden_id: garden.id,
-                message: faker.lorem.paragraph(),
+                message: faker.lorem.paragraph().substring(0, 254),
             },
         });
     }

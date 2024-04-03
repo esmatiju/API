@@ -3,8 +3,10 @@ const prisma = new PrismaClient();
 const bcrypt = require('bcrypt');
 const fs = require("fs");
 const path = require("path");
+const axios = require('axios');
 
 const uploadDir = path.join(__dirname, '..', 'uploads');
+const AUTH_API_URL = process.env.AUTH_API_URL || 'http://localhost:6666/api/auth/verify';
 
 function saveBase64Image(base64Image, filename, req) {
     const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, '');
@@ -107,17 +109,23 @@ const userController = {
     async login(req, res) {
         try {
             const { email, password } = req.body;
-            const user = await prisma.user.findUnique({ where: { email } });
-            if (!user || !(await bcrypt.compare(password, user.password))) {
-                return res.status(401).json({ error: 'Invalid email or password' });
-            }
 
-            const { password: _, ...userInfo } = user;
-            res.json(userInfo);
+            const response = await axios.post(`${AUTH_API_URL}`, { email, password });
+
+            if (response.status === 200) {
+                res.json(response.data);
+            } else {
+                res.status(response.status).json({ error: response.data.error });
+            }
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            if (error.response) {
+                res.status(error.response.status).json({ error: error.response.data.error });
+            } else {
+                res.status(500).json({ error: error.message });
+            }
         }
     },
+
 };
 
 module.exports = userController;

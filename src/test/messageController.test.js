@@ -1,7 +1,7 @@
 const request = require('supertest');
 const app = require('../app'); // Assurez-vous que votre app express est correctement exportée pour les tests
 
-// Mock PrismaClient
+jest.mock('../middleware/authMiddleware', () => (req, res, next) => next());
 jest.mock('@prisma/client', () => ({
     PrismaClient: class {
         constructor() {

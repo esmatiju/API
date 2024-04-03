@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('../app');
 
+jest.mock('../middleware/authMiddleware', () => (req, res, next) => next());
 jest.mock('@prisma/client', () => ({
     PrismaClient: class {
         constructor() {

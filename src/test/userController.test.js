@@ -1,6 +1,7 @@
 const request = require('supertest');
-const app = require('../app'); // Assurez-vous que cela pointe vers votre fichier app.js Express correct
+const app = require('../app');
 
+jest.mock('../middleware/authMiddleware', () => (req, res, next) => next());
 jest.mock('@prisma/client', () => ({
     PrismaClient: class {
         constructor() {
@@ -34,7 +35,7 @@ describe('User Controller Tests', () => {
         expect(Array.isArray(response.body)).toBeTruthy();
     });
 
-    test('POST /api/users should create a new user', async () => {
+    test('POST /api/users/signup should create a new user', async () => {
         const newUser = {
             lastname: 'Doe',
             firstname: 'John',
@@ -44,7 +45,7 @@ describe('User Controller Tests', () => {
             picture_url: 'http://example.com/image.jpg',
         };
 
-        const response = await request(app).post('/api/users').send(newUser);
+        const response = await request(app).post('/api/users/signup').send(newUser);
         expect(response.statusCode).toBe(201);
         expect(response.body).toHaveProperty('id');
     });
