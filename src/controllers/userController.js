@@ -113,7 +113,8 @@ const userController = {
             const response = await axios.post(`${AUTH_API_URL}`, { email, password });
 
             if (response.status === 200) {
-                res.json(response.data);
+                const user = await prisma.user.findUnique({where: {email}});
+                res.json({ user: user, token: response.data });
             } else {
                 res.status(response.status).json({ error: response.data.error });
             }
