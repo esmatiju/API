@@ -40,6 +40,26 @@ async function handlePhotos(photos, gardenId, req) {
 }
 
 const gardenController = {
+    /**
+     * @swagger
+     * /gardens:
+     *   get:
+     *     summary: Récupérer la liste des jardins
+     *     tags: [Gardens]
+     *     security:
+     *       - BearerAuth: []
+     *     responses:
+     *       200:
+     *         description: La liste des jardins
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                 $ref: '#/components/schemas/Garden'
+     *       500:
+     *         description: Erreur serveur
+     */
     async getAll(req, res) {
         try {
             const gardens = await prisma.garden.findMany({
@@ -58,6 +78,33 @@ const gardenController = {
         }
     },
 
+    /**
+     * @swagger
+     * /gardens/{id}:
+     *   get:
+     *     summary: Récupérer un jardin par ID
+     *     tags: [Gardens]
+     *     security:
+     *       - BearerAuth: []
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         schema:
+     *           type: string
+     *         required: true
+     *         description: ID du jardin
+     *     responses:
+     *       200:
+     *         description: Détails du jardin
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Garden'
+     *       404:
+     *         description: Jardin non trouvé
+     *       500:
+     *         description: Erreur serveur
+     */
     async getOne(req, res) {
         try {
             const { id } = req.params;
@@ -78,6 +125,30 @@ const gardenController = {
         }
     },
 
+    /**
+     * @swagger
+     * /gardens:
+     *   post:
+     *     summary: Créer un nouveau jardin
+     *     tags: [Gardens]
+     *     security:
+     *       - BearerAuth: []
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/Garden'
+     *     responses:
+     *       201:
+     *         description: Jardin créé
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Garden'
+     *       500:
+     *         description: Erreur serveur
+     */
     async create(req, res) {
         const { latitude, longitude, address, ville, cp, owner_id, status, botanist_id, photos } = req.body;
 
@@ -99,6 +170,37 @@ const gardenController = {
         }
     },
 
+    /**
+     * @swagger
+     * /gardens/{id}:
+     *   put:
+     *     summary: Mettre à jour un jardin
+     *     tags: [Gardens]
+     *     security:
+     *       - BearerAuth: []
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         schema:
+     *           type: string
+     *         required: true
+     *         description: ID du jardin
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/Garden'
+     *     responses:
+     *       200:
+     *         description: Jardin mis à jour
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Garden'
+     *       500:
+     *         description: Erreur serveur
+     */
     async update(req, res) {
         const { id } = req.params;
         const { latitude, longitude, address, ville, cp, owner_id, status, botanist_id, photos } = req.body;
@@ -124,6 +226,27 @@ const gardenController = {
         }
     },
 
+    /**
+     * @swagger
+     * /gardens/{id}:
+     *   delete:
+     *     summary: Supprimer un jardin
+     *     tags: [Gardens]
+     *     security:
+     *       - BearerAuth: []
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         schema:
+     *           type: string
+     *         required: true
+     *         description: ID du jardin
+     *     responses:
+     *       204:
+     *         description: Jardin supprimé
+     *       500:
+     *         description: Erreur serveur
+     */
     async delete(req, res) {
         const { id } = req.params;
 

@@ -2,6 +2,26 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const messageController = {
+    /**
+     * @swagger
+     * /messages:
+     *   get:
+     *     summary: Récupérer la liste des messages
+     *     tags: [Messages]
+     *     security:
+     *       - BearerAuth: []
+     *     responses:
+     *       200:
+     *         description: La liste des messages
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                 $ref: '#/components/schemas/Message'
+     *       500:
+     *         description: Une erreur s'est produite lors de la récupération des messages
+     */
     async getAll(req, res) {
         try {
             const messages = await prisma.message.findMany();
@@ -12,6 +32,33 @@ const messageController = {
         }
     },
 
+    /**
+     * @swagger
+     * /messages/{id}:
+     *   get:
+     *     summary: Récupérer un message par ID
+     *     tags: [Messages]
+     *     security:
+     *       - BearerAuth: []
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         schema:
+     *           type: string
+     *         required: true
+     *         description: ID du message
+     *     responses:
+     *       200:
+     *         description: Détails du message
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Message'
+     *       404:
+     *         description: Message non trouvé
+     *       500:
+     *         description: Une erreur s'est produite lors de la récupération du message
+     */
     async getOne(req, res) {
         try {
             const { id } = req.params;
@@ -27,6 +74,32 @@ const messageController = {
         }
     },
 
+    /**
+     * @swagger
+     * /messages:
+     *   post:
+     *     summary: Créer un nouveau message
+     *     tags: [Messages]
+     *     security:
+     *       - BearerAuth: []
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/Message'
+     *     responses:
+     *       201:
+     *         description: Message créé
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Message'
+     *       400:
+     *         description: Les champs "user_id", "garden_id" et "message" sont obligatoires
+     *       500:
+     *         description: Une erreur s'est produite lors de la création du message
+     */
     async create(req, res) {
         try {
             const { user_id, garden_id, message } = req.body;
@@ -43,6 +116,41 @@ const messageController = {
         }
     },
 
+    /**
+     * @swagger
+     * /messages/{id}:
+     *   put:
+     *     summary: Mettre à jour un message
+     *     tags: [Messages]
+     *     security:
+     *       - BearerAuth: []
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         schema:
+     *           type: string
+     *         required: true
+     *         description: ID du message
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/Message'
+     *     responses:
+     *       200:
+     *         description: Message mis à jour
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Message'
+     *       400:
+     *         description: Le champ "message" est obligatoire
+     *       404:
+     *         description: Message non trouvé
+     *       500:
+     *         description: Une erreur s'est produite lors de la mise à jour du message
+     */
     async update(req, res) {
         try {
             const { id } = req.params;
@@ -68,6 +176,29 @@ const messageController = {
         }
     },
 
+    /**
+     * @swagger
+     * /messages/{id}:
+     *   delete:
+     *     summary: Supprimer un message
+     *     tags: [Messages]
+     *     security:
+     *       - BearerAuth: []
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         schema:
+     *           type: string
+     *         required: true
+     *         description: ID du message
+     *     responses:
+     *       204:
+     *         description: Message supprimé
+     *       404:
+     *         description: Message non trouvé
+     *       500:
+     *         description: Une erreur s'est produite lors de la suppression du message
+     */
     async delete(req, res) {
         try {
             const { id } = req.params;

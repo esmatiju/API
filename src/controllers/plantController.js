@@ -46,6 +46,26 @@ async function processTagsAndPhotos(tags, photos, plantId, req) {
 }
 
 const plantController = {
+    /**
+     * @swagger
+     * /plants:
+     *   get:
+     *     summary: Récupérer la liste des plantes
+     *     tags: [Plants]
+     *     security:
+     *       - BearerAuth: []
+     *     responses:
+     *       200:
+     *         description: La liste des plantes
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                 $ref: '#/components/schemas/Plant'
+     *       500:
+     *         description: Erreur serveur
+     */
     async getAll(req, res) {
         try {
             const plants = await prisma.plant.findMany({
@@ -66,6 +86,33 @@ const plantController = {
         }
     },
 
+    /**
+     * @swagger
+     * /plants/{id}:
+     *   get:
+     *     summary: Récupérer une plante par ID
+     *     tags: [Plants]
+     *     security:
+     *       - BearerAuth: []
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         schema:
+     *           type: string
+     *         required: true
+     *         description: ID de la plante
+     *     responses:
+     *       200:
+     *         description: Détails de la plante
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Plant'
+     *       404:
+     *         description: Plante non trouvée
+     *       500:
+     *         description: Erreur serveur
+     */
     async getOne(req, res) {
         try {
             const { id } = req.params;
@@ -92,6 +139,30 @@ const plantController = {
         }
     },
 
+    /**
+     * @swagger
+     * /plants:
+     *   post:
+     *     summary: Créer une nouvelle plante
+     *     tags: [Plants]
+     *     security:
+     *       - BearerAuth: []
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/Plant'
+     *     responses:
+     *       201:
+     *         description: Plante créée
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Plant'
+     *       500:
+     *         description: Erreur serveur
+     */
     async create(req, res) {
         const { name, description, hint, fullname, picture_url, tags, photos } = req.body;
 
@@ -108,6 +179,37 @@ const plantController = {
         }
     },
 
+    /**
+     * @swagger
+     * /plants/{id}:
+     *   put:
+     *     summary: Mettre à jour une plante
+     *     tags: [Plants]
+     *     security:
+     *       - BearerAuth: []
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         schema:
+     *           type: string
+     *         required: true
+     *         description: ID de la plante
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/Plant'
+     *     responses:
+     *       200:
+     *         description: Plante mise à jour
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Plant'
+     *       500:
+     *         description: Erreur serveur
+     */
     async update(req, res) {
         const { name, description, hint, fullname, picture_url, tags, photos } = req.body;
         const plantId = parseInt(req.params.id);
@@ -125,6 +227,27 @@ const plantController = {
         }
     },
 
+    /**
+     * @swagger
+     * /plants/{id}:
+     *   delete:
+     *     summary: Supprimer une plante
+     *     tags: [Plants]
+     *     security:
+     *       - BearerAuth: []
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         schema:
+     *           type: string
+     *         required: true
+     *         description: ID de la plante
+     *     responses:
+     *       204:
+     *         description: Plante supprimée
+     *       500:
+     *         description: Erreur serveur
+     */
     async delete(req, res) {
         const plantId = req.params.id;
 

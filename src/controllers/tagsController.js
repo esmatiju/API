@@ -2,6 +2,26 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const tagsController = {
+    /**
+     * @swagger
+     * /tags:
+     *   get:
+     *     summary: Récupérer la liste des tags
+     *     tags: [Tags]
+     *     security:
+     *       - BearerAuth: []
+     *     responses:
+     *       200:
+     *         description: La liste des tags
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                 $ref: '#/components/schemas/Tag'
+     *       500:
+     *         description: Une erreur s'est produite lors de la récupération des tags
+     */
     async getAll(req, res) {
         try {
             const tags = await prisma.tags.findMany();
@@ -12,6 +32,33 @@ const tagsController = {
         }
     },
 
+    /**
+     * @swagger
+     * /tags/{id}:
+     *   get:
+     *     summary: Récupérer un tag par ID
+     *     tags: [Tags]
+     *     security:
+     *       - BearerAuth: []
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         schema:
+     *           type: string
+     *         required: true
+     *         description: ID du tag
+     *     responses:
+     *       200:
+     *         description: Détails du tag
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Tag'
+     *       404:
+     *         description: Tag non trouvé
+     *       500:
+     *         description: Une erreur s'est produite lors de la récupération du tag
+     */
     async getOne(req, res) {
         try {
             const { id } = req.params;
@@ -27,6 +74,32 @@ const tagsController = {
         }
     },
 
+    /**
+     * @swagger
+     * /tags:
+     *   post:
+     *     summary: Créer un nouveau tag
+     *     tags: [Tags]
+     *     security:
+     *       - BearerAuth: []
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/Tag'
+     *     responses:
+     *       201:
+     *         description: Tag créé
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Tag'
+     *       400:
+     *         description: Le champ "name" est obligatoire
+     *       500:
+     *         description: Une erreur s'est produite lors de la création du tag
+     */
     async create(req, res) {
         try {
             const { name } = req.body;
@@ -42,6 +115,41 @@ const tagsController = {
         }
     },
 
+    /**
+     * @swagger
+     * /tags/{id}:
+     *   put:
+     *     summary: Mettre à jour un tag
+     *     tags: [Tags]
+     *     security:
+     *       - BearerAuth: []
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         schema:
+     *           type: string
+     *         required: true
+     *         description: ID du tag
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/Tag'
+     *     responses:
+     *       200:
+     *         description: Tag mis à jour
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Tag'
+     *       400:
+     *         description: Le champ "name" est obligatoire
+     *       404:
+     *         description: Tag non trouvé
+     *       500:
+     *         description: Une erreur s'est produite lors de la mise à jour du tag
+     */
     async update(req, res) {
         try {
             const { id } = req.params;
@@ -65,6 +173,29 @@ const tagsController = {
         }
     },
 
+    /**
+     * @swagger
+     * /tags/{id}:
+     *   delete:
+     *     summary: Supprimer un tag
+     *     tags: [Tags]
+     *     security:
+     *       - BearerAuth: []
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         schema:
+     *           type: string
+     *         required: true
+     *         description: ID du tag
+     *     responses:
+     *       204:
+     *         description: Tag supprimé
+     *       404:
+     *         description: Tag non trouvé
+     *       500:
+     *         description: Une erreur s'est produite lors de la suppression du tag
+     */
     async delete(req, res) {
         try {
             const { id } = req.params;

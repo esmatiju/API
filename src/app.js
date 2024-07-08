@@ -8,11 +8,15 @@ const gardenRoutes = require('./routes/gardenRoutes');
 const botanistRoutes = require('./routes/botanistRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const authMiddleware = require("./middleware/authMiddleware");
-var app = express();
+const swagger = require('./swagger');
 
+const app = express();
 
 app.use(express.json());
 app.use(authMiddleware);
+
+swagger(app);
+
 app.use('/api/users', userRoutes);
 app.use('/api/plants', plantRoutes);
 app.use('/api/tags', tagsRoutes);
